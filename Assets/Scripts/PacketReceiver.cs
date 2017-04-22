@@ -14,10 +14,9 @@ public class PacketReceiver : MonoBehaviour {
     [SerializeField]
     private string host = "192.168.0.2";
 
-    UdpClient client;
-    string text;
-    IPAddress server;
-    IPEndPoint remoteEP;
+    private UdpClient client;
+    private string text;
+    private IPEndPoint remoteEP;
     private bool flag = false;
 
     public String Data
@@ -28,7 +27,6 @@ public class PacketReceiver : MonoBehaviour {
     void Start()
     {
         Debug.Log("Starting Client");
-        server = IPAddress.Parse(host);
         remoteEP = new IPEndPoint(IPAddress.Any, 0);
         client = new UdpClient(port);
         //client.JoinMulticastGroup(groupIP);
@@ -50,9 +48,7 @@ public class PacketReceiver : MonoBehaviour {
     {
         //Debug.Log("Received Server Info");
         byte[] receivedBytes = client.EndReceive(result, ref remoteEP);
-        //byte[] data = client.Receive(ref remoteEP);
 
-        // encode UTF8-coded bytes to text format
         text = Encoding.ASCII.GetString(receivedBytes);
 
         // show received message
