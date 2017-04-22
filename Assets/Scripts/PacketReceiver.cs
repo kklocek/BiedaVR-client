@@ -8,7 +8,7 @@ using UnityEngine;
 public class PacketReceiver : MonoBehaviour {
 
     [SerializeField]
-    private int port = 8080;
+    private int port = 8082;
 
     private Thread readThread;
     private UdpClient client;
