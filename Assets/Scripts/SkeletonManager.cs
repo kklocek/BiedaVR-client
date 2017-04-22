@@ -8,8 +8,8 @@ public class SkeletonManager : MonoBehaviour {
     private Transform[] spheres;
     [SerializeField]
     private PacketReceiver packetReceiver;
-	// Use this for initialization
-	void Start () {
+
+    void Start () {
         Transform [] allTransforms = GetComponentsInChildren<Transform>();
         spheres = new Transform[allTransforms.Length - 1];
         for(int i = 0, j = 0; i < allTransforms.Length; i++, j++)
@@ -29,7 +29,6 @@ public class SkeletonManager : MonoBehaviour {
 	void Update () {
         if (packetReceiver.Data == null)
             return;
-
         string [] data = packetReceiver.Data.Split(';');
         float[] floats = new float[data.Length - 1];
         for(int i = 0; i < data.Length - 1; i++)

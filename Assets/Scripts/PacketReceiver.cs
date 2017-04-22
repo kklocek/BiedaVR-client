@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public class PacketReceiver : MonoBehaviour {
 
     [SerializeField]
     private int port = 8080;
-    [SerializeField]
-    private string host = "192.168.0.2";
 
+    private Thread readThread;
     private UdpClient client;
     private string text;
     private IPEndPoint remoteEP;
@@ -24,36 +21,36 @@ public class PacketReceiver : MonoBehaviour {
         get { return text; }
     }
 
-    void Start()
+    private void Start()
     {
-        Debug.Log("Starting Client");
-        remoteEP = new IPEndPoint(IPAddress.Any, 0);
-        client = new UdpClient(port);
-        //client.JoinMulticastGroup(groupIP);
-        client.Client.Blocking = false;
-        client.BeginReceive(new AsyncCallback(ReceiveServerInfo), null);
-
+        readThread = new Thread(new ThreadStart(ReceiveData));
+        readThread.IsBackground = true;
+        readThread.Start();
     }
 
-    private void Update()
+    private void ReceiveData()
     {
-        if(flag)
+        remoteEP = new IPEndPoint(IPAddress.Any, 0);
+        client = new UdpClient(port);
+
+        while(true)
         {
-            client.BeginReceive(new AsyncCallback(ReceiveServerInfo), null);
-            flag = false;
+            byte[] receivedBytes = client.Receive(ref remoteEP);
+            text = Encoding.ASCII.GetString(receivedBytes);
         }
     }
 
-    void ReceiveServerInfo(IAsyncResult result)
+    private void OnApplicationQuit()
     {
-        //Debug.Log("Received Server Info");
-        byte[] receivedBytes = client.EndReceive(result, ref remoteEP);
+        stopThread();
+    }
 
-        text = Encoding.ASCII.GetString(receivedBytes);
-
-        // show received message
-        //if (text != null && text != "")
-        //    Debug.Log(">> " + text);
-        flag = true;
+    private void stopThread()
+    {
+        if (readThread.IsAlive)
+        {
+            readThread.Abort();
+        }
+        client.Close();
     }
 }
